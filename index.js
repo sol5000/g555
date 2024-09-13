@@ -83,5 +83,5 @@ try {
 	}
 }
 console.log("Iteration", i);
-}, i * 5000); // 10000 milliseconds = 10 seconds
+}, i * 9000); // 10000 milliseconds = 10 seconds
 }
