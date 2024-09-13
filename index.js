@@ -1,4 +1,4 @@
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 100; i++) {
     setTimeout(() => {
 try {
 	process.env.LESSONS = process.env.LESSONS ?? 1;
@@ -83,5 +83,5 @@ try {
 	}
 }
 console.log("Iteration", i);
-}, i * 10000); // 10000 milliseconds = 10 seconds
+}, i * 1000); // 10000 milliseconds = 10 seconds
 }
