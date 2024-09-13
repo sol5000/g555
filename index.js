@@ -1,3 +1,4 @@
+for (let i = 0; i < 1000; i++) {
 try {
 	process.env.LESSONS = process.env.LESSONS ?? 1;
 
@@ -79,4 +80,4 @@ try {
 	if (error instanceof Error) {
 		console.log(error.message);
 	}
-}
+}}
