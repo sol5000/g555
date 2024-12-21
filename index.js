@@ -1,6 +1,3 @@
-// Import fetch only if using Node.js < 18
-const fetch = require("node-fetch");
-
 // Ensure LESSONS is an integer
 process.env.LESSONS = parseInt(process.env.LESSONS ?? "1", 10);
 
@@ -15,6 +12,7 @@ const headers = {
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
 };
 
+// Decode JWT to extract user details
 const { sub } = JSON.parse(
   Buffer.from(process.env.DUOLINGO_JWT.split(".")[1], "base64").toString()
 );
@@ -22,15 +20,21 @@ const { sub } = JSON.parse(
 (async function runHack() {
   for (let i = 0; i < 100; i++) {
     try {
+      // Fetch user languages
       const response = await fetch(
         `https://www.duolingo.com/2017-06-30/users/${sub}?fields=fromLanguage,learningLanguage`,
         { headers }
       );
+
       const { fromLanguage, learningLanguage } = await response.json();
 
       let xp = 0;
+
+      // Generate practice sessions
       const promises = Array.from({ length: process.env.LESSONS }).map(() =>
         fetch("https://www.duolingo.com/2017-06-30/sessions", {
+          method: "POST",
+          headers,
           body: JSON.stringify({
             challengeTypes: [
               "assist",
@@ -49,14 +53,14 @@ const { sub } = JSON.parse(
             smartTipsVersion: 2,
             type: "GLOBAL_PRACTICE",
           }),
-          headers,
-          method: "POST",
         })
           .then((res) => res.json())
-          .then((session) => {
-            return fetch(
+          .then((session) =>
+            fetch(
               `https://www.duolingo.com/2017-06-30/sessions/${session.id}`,
               {
+                method: "PUT",
+                headers,
                 body: JSON.stringify({
                   ...session,
                   heartsLeft: 0,
@@ -67,11 +71,9 @@ const { sub } = JSON.parse(
                   maxInLessonStreak: 9,
                   shouldLearnThings: true,
                 }),
-                headers,
-                method: "PUT",
               }
-            );
-          })
+            )
+          )
           .then((res) => res.json())
           .then((res) => {
             xp += res.xpGain || 0;
@@ -83,6 +85,8 @@ const { sub } = JSON.parse(
     } catch (error) {
       console.error(`❌ Iteration ${i + 1}: Something went wrong`, error);
     }
-    await new Promise((resolve) => setTimeout(resolve, 10000)); // Delay 10 seconds
+
+    // Wait 10 seconds before next iteration
+    await new Promise((resolve) => setTimeout(resolve, 10000));
   }
 })();
