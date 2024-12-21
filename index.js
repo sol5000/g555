@@ -1,7 +1,9 @@
-const fetch = require("node-fetch"); // Add if using Node.js < 18
+// Import fetch only if using Node.js < 18
+const fetch = require("node-fetch");
 
-// Ensure environment variables are properly set
-process.env.LESSONS = process.env.LESSONS ?? 1;
+// Ensure LESSONS is an integer
+process.env.LESSONS = parseInt(process.env.LESSONS ?? "1", 10);
+
 if (!process.env.DUOLINGO_JWT) {
   throw new Error("DUOLINGO_JWT environment variable is required.");
 }
@@ -13,7 +15,6 @@ const headers = {
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
 };
 
-// Parse the JWT to extract user details
 const { sub } = JSON.parse(
   Buffer.from(process.env.DUOLINGO_JWT.split(".")[1], "base64").toString()
 );
